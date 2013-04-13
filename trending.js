@@ -1,5 +1,6 @@
-var api = "https://api.stackexchange.com/2.1/questions?";
+var api = 'https://api.stackexchange.com/2.1/questions?';
 var filter = '!3y)18yprZhEubM2P-';
+var key = 'aVrqQOegd6hCOfP9fkFE)Q((';
 
 function pretty_print_json(json) {
     'use strict';
@@ -8,27 +9,28 @@ function pretty_print_json(json) {
     return out;
 }
 
-function construct_request(site, tags, period) {
-    'use strict';
-    var request = api;
-    request += "order=desc&";
-    request += "sort=votes&";
-    request += "site=" + site + "&";
-    if (tags.length !== 0) {
-        request += "tagged=" + tags.join(";") + "&";
-    }
-    if (period !== null) {
-        request += "fromdate=" + period.start + "&";
-        request += "todate=" + period.end + "&";
-    }
-    request += "filter=" + filter + "&";
-    return request;
-}
-
 function debug_json_request(data, textStatus, jqXHR) {
     'use strict';
     var pretty_data = pretty_print_json(data);
     $('#rawjson').text(pretty_data);
+}
+
+function construct_request(site, tags, period) {
+    'use strict';
+    var request = api;
+    request += 'key=' + key + '&';
+    request += 'order=desc&';
+    request += 'sort=votes&';
+    request += 'site=' + site + '&';
+    if (tags.length !== 0) {
+        request += 'tagged=' + tags.join(';') + '&';
+    }
+    if (period !== null) {
+        request += 'fromdate=' + period.start + '&';
+        request += 'todate=' + period.end + '&';
+    }
+    request += 'filter=' + filter + '&';
+    return request;
 }
 
 function make_raw_request(request_url, success_func, error_func) {
@@ -42,16 +44,16 @@ function make_raw_request(request_url, success_func, error_func) {
 
 function get_time_range(type) {
     'use strict';
-    if (type === "All time") {
+    if (type === 'All time') {
         return null;
     }
     var current = new Date();
     var mapping = {
-        "This year":  365 * 24,
-        "This month": 30 * 24,
-        "This week":  7 * 24,
-        "This day":   24,
-        "This hour":  1
+        'This year':  365 * 24,
+        'This month': 30 * 24,
+        'This week':  7 * 24,
+        'This day':   24,
+        'This hour':  1
     };
     var previous = new Date();
     previous.setHours(current.getHours() - mapping[type]);
@@ -64,7 +66,7 @@ function get_time_range(type) {
 
 function split_tags(tags) {
     'use strict';
-    var re = new RegExp("[,; ]+");
+    var re = new RegExp('[,; ]+');
     var out = tags.split(re);
     return out;
 }
@@ -153,7 +155,7 @@ function handle_failure(data, textStatus, jqXHR) {
 
 function bind_form_trigger() {
     'use strict';
-    $("#submit").click(function() {
+    $('#submit').click(function() {
         $('#errors').empty();
         
         var site = $.trim($('#site_input').val());
@@ -165,7 +167,7 @@ function bind_form_trigger() {
         );
         
         if (tags.length > 5) {
-            $('#errors').append("You have more then 5 tags.");
+            $('#errors').append('You have more then 5 tags.');
             return;
         }
         
