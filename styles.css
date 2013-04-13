@@ -1,0 +1,160 @@
+*{
+    -webkit-box-sizing: border-box;
+       -moz-box-sizing: border-box;
+            box-sizing: border-box;
+    margin:0;
+    padding:0;
+}
+
+body{
+    padding:1em;
+    background-color:#eee;
+    font-family: Arial,Liberation Sans,DejaVu Sans,sans-serif;
+}
+
+h1,h2{
+    font-family: Futura, "Trebuchet MS", Arial, sans-serif;
+    margin:1em 0;
+}
+
+h3{
+    font-weight:500;
+}
+
+#wrapper{
+    margin:0 auto;
+    padding:1em;
+    background-color:#fff;
+    max-width:48em;
+}
+
+#errors{
+    color:red;
+    margin:1em 0;
+}
+
+form{
+    position:relative;
+}
+
+label{
+    float:left;
+    margin-right:1em;
+    width:6em;
+}
+
+input[type="text"]{
+    margin:0 0 1em;
+    width:20em;
+}
+
+input[type="button"]{
+    margin-left:8.5em;
+}
+
+select{
+    width:15em;
+    margin-bottom:1em;
+}
+
+.mandatory:after{
+    content:" *";
+    color:red;
+}
+
+
+#questions{
+    border-top:1px solid #ccc;
+    margin:1em 0 0;
+    padding:1em;
+}
+
+.question{
+    padding:1em 0;
+    border-bottom:1px dashed #aaa;
+}
+
+.question:after{
+    content:"";
+    display:table;
+    clear:both;
+}
+
+.box{
+    float:left;
+    width:4em;
+    height:auto;
+    padding:.2em;
+}
+
+.votes{
+    background-color:#88ff88;
+}
+
+.answers,.views{
+    color:#888;
+}
+
+.count{
+    margin:0 auto;
+    font-size:1.3em;
+    text-align:center;
+}
+
+.thousands{
+    font-size:.95em;
+}
+
+.type{
+    font-size:.9em;
+    text-align:center;
+}
+
+.side{
+    float:left;
+    display:block;
+    width:30em;
+}
+
+.title{
+    font-size:1.1em;
+}
+
+.title a{
+    text-decoration:none;
+}
+
+.title a:hover{
+    text-decoration:underline;
+}
+
+.tags{
+    display:block;
+    list-style-type:none;
+    margin:.3em 0 0;
+    padding:0;
+}
+
+.tags li{
+    display:block;
+    float:left;
+    border-right:1px solid #888;
+    border-bottom:1px solid #888;
+    background-color:#eee;
+    padding:.1em .15em;
+    margin-right:.3em;
+}
+
+.tags li:hover{
+    border-left:1px solid #ccc;
+    border-top:1px solid #ccc;
+    border-right:0;
+    border-bottom:0;
+    background-color:#e4e4e4;
+}
+
+.tags a{
+    text-decoration:none;
+    color:rgb(62,109,142);
+    font-size:.8em;
+}
