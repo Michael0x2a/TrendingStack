@@ -25,7 +25,7 @@ h3{
     margin:0 auto;
     padding:1em;
     background-color:#fff;
-    max-width:48em;
+    max-width:47em;
 }
 
 #errors{
@@ -53,7 +53,7 @@ input[type="button"]{
 }
 
 select{
-    width:15em;
+    width:20em;
     margin-bottom:1em;
 }
 

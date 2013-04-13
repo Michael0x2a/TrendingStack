@@ -1,4 +1,3 @@
-var test = "https://api.stackexchange.com/2.1/questions?order=desc&sort=activity&site=stackoverflow";
 var api = "https://api.stackexchange.com/2.1/questions?";
 var filter = '!3y)18yprZhEubM2P-';
 
