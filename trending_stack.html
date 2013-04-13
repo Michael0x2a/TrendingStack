@@ -34,7 +34,11 @@
             margin:0 auto;
             padding:1em;
             background-color:#fff;
-            border-radius:1em;
+        }
+        
+        #errors{
+            color:red;
+            margin:1em 0;
         }
         
         form{
@@ -45,10 +49,6 @@
             float:left;
             margin-right:1em;
             width:6em;
-        }
-        
-        textarea:focus, input:focus{
-            border:2px solid $900;
         }
         
         input[type="text"]{
@@ -72,7 +72,7 @@
         
         
         #questions{
-            border-top:1px solid #000;
+            border-top:1px solid #ccc;
             margin:1em 0 0;
             padding:1em;
         }
@@ -107,6 +107,10 @@
             margin:0 auto;
             font-size:1.3em;
             text-align:center;
+        }
+        
+        .thousands{
+            font-size:.95em;
         }
         
         .type{
@@ -201,9 +205,13 @@
             $('#rawjson').text(pretty_data);
         }
         
-        function make_raw_request(url, success) {
+        function make_raw_request(request_url, success_func, error_func) {
             'use strict';
-            $.getJSON(url, success);
+            $.ajax({
+                url: request_url,
+                dataType: 'json',
+                success: success_func,
+                error: error_func});
         }
         
         function get_time_range(type) {
@@ -233,6 +241,16 @@
             var re = new RegExp("[,; ]+");
             var out = tags.split(re);
             return out;
+        }
+        
+        function clean_number(num) {
+            'use strict';
+            if (num >= 10000) {
+                var new_num = Math.round(num / 1000);
+                return new_num.toString() + '<span class="thousands">k</span>';
+            } else {
+                return num.toString();
+            }
         }
         
         function make_question(scores, answers, views, title, link, tags) {
@@ -288,9 +306,9 @@
             }
             jQuery.each(data['items'], function(index, value) {
                 var html = make_question(
-                    value['score'],
-                    value['answer_count'],
-                    value['view_count'],
+                    clean_number(value['score']),
+                    clean_number(value['answer_count']),
+                    clean_number(value['view_count']),
                     value['title'],
                     value['link'],
                     value['tags']
@@ -299,9 +317,19 @@
             });
         }
         
+        function handle_failure(data, textStatus, jqXHR) {
+            var out = [];
+            var root = $.parseJSON(data['responseText']);
+            out.push('<p>Error: ' + root['error_id'] + ' ' + root['error_name'] + '</p>');
+            out.push('<p>' + root['error_message'] + '</p>');
+            $('#errors').append(out.join('\n'));
+        }
+        
         function bind_form_trigger() {
             'use strict';
             $("#submit").click(function() {
+                $('#errors').empty();
+                
                 var site = $.trim($('#site_input').val());
                 var periods = get_time_range(
                     $.trim($('#period_input option:selected').text())
@@ -316,20 +344,14 @@
                 }
                 
                 var request = construct_request(site, tags, periods);
-                $("#errors").append(request);
                 
-                make_raw_request(
-                    request,
-                    display);
+                make_raw_request(request, display, handle_failure);
             });
         }
         
         $(document).ready(function() {
             'use strict';
             bind_form_trigger();
-            //make_raw_request(
-            //    construct_request('stackoverflow', ['c++']), 
-            //    debug_json_request);
         });
     </script>
 </head>
