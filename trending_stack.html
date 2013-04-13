@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
-    <title>title</title>
+    <title>TrendingStack</title>
     <meta name="author" content="name">
     <meta name="description" content="description here">
     <style type="text/css">
@@ -56,7 +56,7 @@
             width:20em;
         }
         
-        input[type="submit"]{
+        input[type="button"]{
             margin-left:8.5em;
         }
         
@@ -117,7 +117,7 @@
         .side{
             float:left;
             display:block;
-            width:31em;
+            width:30em;
         }
         
         .title{
@@ -165,7 +165,7 @@
         
         
     </style>
-    <script type="text/javascript" src="https://ajax.googleapis.com/ajax/libs/jquery/1.9.1/jquery.min.js"></script>
+    <script type="text/javascript" src="https://ajax.googleapis.com/ajax/libs/jquery/1.9.1/jquery.js"></script>
     <script type="text/javascript">
         var test = "https://api.stackexchange.com/2.1/questions?order=desc&sort=activity&site=stackoverflow";
         var api = "https://api.stackexchange.com/2.1/questions?";
@@ -211,35 +211,116 @@
             if (type === "All time") {
                 return null;
             }
-            var current = new Date.getTime();
+            var current = new Date();
             var mapping = {
-                "This year":  new Date(1,0,0,0,0,0,0),
-                "This month": new Date(0,1,0,0,0,0,0),
-                "This day":   new Date(0,0,1,0,0,0,0),
-                "This hour":  new Date(0,0,0,1,0,0,0)
+                "This year":  365 * 24,
+                "This month": 30 * 24,
+                "This week":  7 * 24,
+                "This day":   24,
+                "This hour":  1
             };
+            var previous = new Date();
+            previous.setHours(current.getHours() - mapping[type]);
             var struct = {
-                start: (current - mapping[type]).toString(),
-                end: current.toString()
+                start: Math.floor(previous.getTime() / 1000),
+                end: Math.floor(current.getTime() / 1000)
             };
             return struct;
         }
         
+        function split_tags(tags) {
+            'use strict';
+            var re = new RegExp("[,; ]+");
+            var out = tags.split(re);
+            return out;
+        }
+        
+        function make_question(scores, answers, views, title, link, tags) {
+            'use strict';
+            var out = [];
+            var i;
+            out.push('<div class="question">');
+            out.push('<div class="votes box">');
+            out.push('<div class="count">#</div>'.replace('#', scores));
+            if (scores === 1) {
+                out.push('<div class="type">vote</div>');
+            } else {
+                out.push('<div class="type">votes</div>');
+            }
+            out.push('</div>');
+            out.push('<div class="answers box">');
+            out.push('<div class="count">#</div>'.replace('#', answers));
+            if (answers === 1) {
+                out.push('<div class="type">answer</div>');
+            } else {
+                out.push('<div class="type">answers</div>');
+            }
+            out.push('</div>');
+            out.push('<div class="views box">');
+            out.push('<div class="count">#</div>'.replace('#', views));
+            if (views === 1) {
+                out.push('<div class="type">view</div>');
+            } else {
+                out.push('<div class="type">views</div>');
+            }
+            out.push('</div>');
+            out.push('<div class="side">');
+            out.push('<h3 class="title"><a href="' + link + '">' + title + '</a></h3>');
+            out.push('<ul class="tags">');
+            
+            if (tags.length !== 0) {
+                var site = new RegExp('(.+)questions').exec(link)[0] + '/tagged/';
+                for (i = 0; i < tags.length; i += 1) {
+                    var tag_url = site + tags[i];
+                    out.push('<li><a href="' + tag_url + '">' + tags[i] + '</a></li>');
+                }
+            }
+            out.push('</ul></div></div>');
+            return out.join('\n');
+        }
+        
+        function display(data, textStatus, jqXHR) {
+            'use strict';
+            $('#questions').empty();
+            if (data['items'].length == 0) {
+                $('#questions').text('None found!');
+                return;
+            }
+            jQuery.each(data['items'], function(index, value) {
+                var html = make_question(
+                    value['score'],
+                    value['answer_count'],
+                    value['view_count'],
+                    value['title'],
+                    value['link'],
+                    value['tags']
+                );
+                $('#questions').append(html);
+            });
+        }
+        
         function bind_form_trigger() {
             'use strict';
-            $("#parameters").submit(function() {
+            $("#submit").click(function() {
                 var site = $.trim($('#site_input').val());
-                var period = $.trim($('#period_input option:selected').text());
-                var tags = $.trim($('#tags_input').val());
-                //alert(site + ' ' + period + ' ' + tags);
-                var periods = get_time_range(period);
+                var periods = get_time_range(
+                    $.trim($('#period_input option:selected').text())
+                );
+                var tags = split_tags(
+                    $.trim($('#tags_input').val())
+                );
+                
+                if (tags.length > 5) {
+                    $('#errors').append("You have more then 5 tags.");
+                    return;
+                }
                 
                 var request = construct_request(site, tags, periods);
                 $("#errors").append(request);
                 
-                //make_raw_request(
-                //    request,
-                //    debug_json_request);
+                make_raw_request(
+                    request,
+                    display);
             });
         }
         
@@ -285,11 +366,12 @@
             <input id="tags_input" name="tags" tabindex="1" type="text" \>
             <br />
             
-            <input id="submit" type="submit" value="Submit" />
+            <input id="submit" type="button" value="Submit" />
         </form>
         
         <div id="questions">
-            <div class="question">
+            No questions yet!
+            <!--<div class="question">
                 <div class="votes box">
                     <div class="count">2000</div>
                     <div class="type">votes</div>
@@ -310,30 +392,8 @@
                         <li><a href="#">python-imaging-library</a></li>
                     </ul>
                 </div>
-            </div>
+            </div>-->
             
-            <div class="question">
-                <div class="votes box">
-                    <div class="count">2000</div>
-                    <div class="type">votes</div>
-                </div>
-                <div class="answers box">
-                    <div class="count">1</div>
-                    <div class="type">answers</div>
-                </div>
-                <div class="views box">
-                    <div class="count">20</div>
-                    <div class="type">views</div>
-                </div>
-                <div class="side">
-                    <h3 class="title"><a href="#">How to foo a bar? And lots and lots of bloated text, And lots and lots of bloated text, And lots and lots of bloated text, And lots and lots of bloated text</a></h3>
-                    <ul class="tags">
-                        <li><a href="#">python</a></li>
-                        <li><a href="#">c++</a></li>
-                        <li><a href="#">python-imaging-library</a></li>
-                    </ul>
-                </div>
-            </div>
             <pre id="rawjson"></pre>
         </div>
     </div>
