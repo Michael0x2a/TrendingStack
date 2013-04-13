@@ -1,6 +1,8 @@
-var api = 'https://api.stackexchange.com/2.1/questions?';
-var filter = '!3y)18yprZhEubM2P-';
-var key = 'aVrqQOegd6hCOfP9fkFE)Q((';
+var trending_config = {
+    api: 'https://api.stackexchange.com/2.1/questions?',
+    filter: '!3y)18yprZhEubM2P-',
+    key: 'aVrqQOegd6hCOfP9fkFE)Q(('
+};
 
 function pretty_print_json(json) {
     'use strict';
@@ -17,8 +19,8 @@ function debug_json_request(data, textStatus, jqXHR) {
 
 function construct_request(site, tags, period) {
     'use strict';
-    var request = api;
-    request += 'key=' + key + '&';
+    var request = trending_config.api;
+    request += 'key=' + trending_config.key + '&';
     request += 'order=desc&';
     request += 'sort=votes&';
     request += 'site=' + site + '&';
@@ -29,7 +31,7 @@ function construct_request(site, tags, period) {
         request += 'fromdate=' + period.start + '&';
         request += 'todate=' + period.end + '&';
     }
-    request += 'filter=' + filter + '&';
+    request += 'filter=' + trending_config.filter + '&';
     return request;
 }
 
@@ -151,6 +153,8 @@ function handle_failure(data, textStatus, jqXHR) {
     out.push('<p>Error: ' + root['error_id'] + ' ' + root['error_name'] + '</p>');
     out.push('<p>' + root['error_message'] + '</p>');
     $('#errors').append(out.join('\n'));
+    $('#questions').empty();
+    $('#questions').append('None found!');
 }
 
 function bind_form_trigger() {
@@ -172,7 +176,8 @@ function bind_form_trigger() {
         }
         
         var request = construct_request(site, tags, periods);
-        
+        $('#questions').empty();
+        $('#questions').append('Fetching...');
         make_raw_request(request, display, handle_failure);
     });
 }
